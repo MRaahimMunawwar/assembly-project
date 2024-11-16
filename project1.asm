@@ -25,6 +25,8 @@ INCLUDE Irvine32.inc
 
     num1 SDWORD ?
     num2 SDWORD ?
+    num3 SWORD ?
+    num4 SWORD ?
     result SDWORD ?
     op DWORD ?
 
@@ -128,14 +130,17 @@ MULTIPLICATION:
     jmp DISPLAY_RESULT_MULT
 
 DIVISION:
-    call GET_First_Num
-    call GET_SECOND_NUMBER
-    cmp num2, 0
+    call GET_First_Num_Div
+    call GET_Second_Num_Div
+    cmp num4, 0
     je DIV_BY_ZERO
-    mov eax, num1
+    mov eax , 0
+    mov ax,  num3
     xor edx, edx
-    idiv num2
-    mov result, eax
+    cwd
+    idiv num4
+    movsx eax , ax
+    mov result , eax
     jmp DISPLAY_RESULT
 
 SQUARE:
@@ -240,7 +245,7 @@ DISPLAY_RESULT:
     call WriteString
     mov eax, result
     call WriteInt
-    invoke sleep , 1100
+    Invoke sleep , 1100
     call crlf
     call waitmsg
     jmp op_nxt
@@ -308,6 +313,22 @@ PowerDone:
     pop ebx
     ret
 Power ENDP
+
+GET_First_Num_Div PROC
+    mov edx, OFFSET prompt1
+    call WriteString
+    call ReadInt
+    mov num3, ax
+    ret
+GET_First_Num_Div ENDP
+
+GET_Second_Num_Div PROC
+    mov edx, OFFSET prompt1
+    call WriteString
+    call ReadInt
+    mov num4, ax
+    ret
+GET_Second_Num_Div ENDP
 
 GET_First_Num PROC
     mov edx, OFFSET prompt1
