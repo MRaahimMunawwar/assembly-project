@@ -3,6 +3,7 @@ INCLUDE Irvine32.inc
 .data
     prompt1 BYTE "Enter first number : ", 0
     prompt2 BYTE "Enter second number : ", 0
+    prompt3 BYTE "Enter the number : " , 0
     menuPrompt BYTE "Enter operation:", 0
     option1 BYTE "1: Addition", 0
     option2 BYTE "2: Subtraction", 0
@@ -194,8 +195,8 @@ COMBINATION:
     jmp DISPLAY_RESULT
 
 FACTORIAL:
-    call GET_First_Num
-    mov eax, num1
+    call GET_First_Num_Fact
+    mov num1 , eax
     call ComputeFactorial
     mov result, eax
     jmp DISPLAY_RESULT
@@ -287,16 +288,16 @@ SQRTP PROC
 SQRTP ENDP
 
 ComputeFactorial PROC
-    mov ecx, eax
+    mov ecx, num1
     mov eax, 1
-FactorialLoop:
-    cmp ecx, 1
-    jle FactorialDone
-    imul eax, ecx
-    dec ecx
-    jmp FactorialLoop
-FactorialDone:
-    ret
+    FactorialLoop:
+        cmp ecx, 1
+        jle FactorialDone
+        imul eax, ecx
+        dec ecx
+        jmp FactorialLoop
+    FactorialDone:
+        ret
 ComputeFactorial ENDP
 
 Power PROC
@@ -345,4 +346,15 @@ GET_SECOND_NUMBER PROC
     mov num2, eax
     ret
 GET_SECOND_NUMBER ENDP
+
+GET_First_Num_Fact PROC
+    nxt_pt:
+    mov edx, OFFSET prompt3
+    call WriteString
+    call ReadInt
+    cmp eax , 0
+    jl nxt_pt
+    mov num1, eax
+    ret
+GET_First_Num_Fact ENDP
 END main
