@@ -31,6 +31,8 @@ INCLUDE Irvine32.inc
 .code
 main PROC
     
+    op_nxt:
+    call clrscr
     ; Display menu options
     mov edx, OFFSET menuPrompt
     call WriteString
@@ -100,8 +102,11 @@ main PROC
     cmp op, 11
     je MODULUS
     cmp op , 12
-    je EXITER
+    je END_PROGRAM
     jmp INVALID_OP
+
+    
+
 
      
 
@@ -121,6 +126,7 @@ SUBTRACTION:
     jmp DISPLAY_RESULT
 
 MULTIPLICATION:
+    call GET_First_Num
     call GET_SECOND_NUMBER
     mov eax, num1
     imul eax, num2
@@ -128,6 +134,7 @@ MULTIPLICATION:
     jmp DISPLAY_RESULT
 
 DIVISION:
+    call GET_First_Num
     call GET_SECOND_NUMBER
     cmp num2, 0
     je DIV_BY_ZERO
@@ -138,16 +145,19 @@ DIVISION:
     jmp DISPLAY_RESULT
 
 SQUARE:
+    call GET_First_Num
     mov eax, num1
     imul eax, num1
     mov result, eax
     jmp DISPLAY_RESULT
 
 SQRT:
+    call GET_First_Num
     call SQRTP
     jmp DISPLAY_RESULT
 
 PERMUTATION:
+    call GET_First_Num
     call GET_SECOND_NUMBER
     mov eax, num1
     call ComputeFactorial
@@ -164,6 +174,7 @@ PERMUTATION:
     jmp DISPLAY_RESULT
 
 COMBINATION:
+    call GET_First_Num
     call GET_SECOND_NUMBER
     mov eax, num1
     call ComputeFactorial
@@ -184,12 +195,14 @@ COMBINATION:
     jmp DISPLAY_RESULT
 
 FACTORIAL:
+    call GET_First_Num
     mov eax, num1
     call ComputeFactorial
     mov result, eax
     jmp DISPLAY_RESULT
 
 EXPONENTIATION:
+    call GET_First_Num
     call GET_SECOND_NUMBER
     mov eax, num1
     mov ecx, num2
@@ -198,6 +211,7 @@ EXPONENTIATION:
     jmp DISPLAY_RESULT
 
 MODULUS:
+    call GET_First_Num
     call GET_SECOND_NUMBER
     mov eax, num1
     mov ebx, num2
@@ -209,40 +223,47 @@ MODULUS:
 INVALID_OP:
     mov edx, OFFSET InvalidOperation
     call WriteString
-    jmp END_PROGRAM
+    jmp op_nxt
+   
 
 DIV_BY_ZERO:
     mov edx, OFFSET DivByZero
     call WriteString
-    jmp END_PROGRAM
+    jmp op_nxt
+    
 
 INVALID_INPUT:
     mov edx, OFFSET InvalidInput
     call WriteString
-    jmp END_PROGRAM
+    jmp op_nxt
+    
 
 DISPLAY_RESULT:
     mov edx, OFFSET resultStr
     call WriteString
     mov eax, result
     call WriteInt
-    jmp END_PROGRAM
+    invoke sleep , 800
+    call crlf
+    call waitmsg
+    jmp op_nxt
+    
+END_PROGRAM:
+    mov edx , offset exitingmsg
+    call writestring
+    call crlf
+    call WaitMsg
 
-GET_SECOND_NUMBER PROC
-    mov edx, OFFSET prompt2
-    call WriteString
-    call ReadInt
-    mov num2, eax
+    exit
+main ENDP
+
+SQRTP PROC
+    finit
+    fild num1
+    fsqrt
+    fistp result
     ret
-GET_SECOND_NUMBER ENDP
-
-GET_First_Num PROC
-    ; Read first number
-    mov edx, OFFSET prompt1
-    call WriteString
-    call ReadInt
-    mov num1, eax
-GET_First_Num ENDP
+SQRTP ENDP
 
 ComputeFactorial PROC
     mov ecx, eax
@@ -272,22 +293,19 @@ PowerDone:
     ret
 Power ENDP
 
-SQRTP PROC
-    finit
-    fild num1
-    fsqrt
-    fistp result
+GET_First_Num PROC
+    mov edx, OFFSET prompt1
+    call WriteString
+    call ReadInt
+    mov num1, eax
     ret
-SQRTP ENDP
+GET_First_Num ENDP
 
-EXITER:
-END_PROGRAM:
-    call Crlf
-    mov edx , offset exitingmsg
-    call writestring
-    call crlf
-    call WaitMsg
-    exit
-main ENDP
-
+GET_SECOND_NUMBER PROC
+    mov edx, OFFSET prompt2
+    call WriteString
+    call ReadInt
+    mov num2, eax
+    ret
+GET_SECOND_NUMBER ENDP
 END main
