@@ -1,8 +1,8 @@
 INCLUDE Irvine32.inc
 
 .data
-    prompt1 BYTE "Enter first number (n): ", 0
-    prompt2 BYTE "Enter second number (r): ", 0
+    prompt1 BYTE "Enter first number : ", 0
+    prompt2 BYTE "Enter second number : ", 0
     menuPrompt BYTE "Enter operation:", 0
     option1 BYTE "1: Addition", 0
     option2 BYTE "2: Subtraction", 0
@@ -15,10 +15,14 @@ INCLUDE Irvine32.inc
     option9 BYTE "9: Factorial", 0
     option10 BYTE "10: Exponentiation", 0
     option11 BYTE "11: Modulus", 0
+    option12 BYTE "12: Exit ", 0
+
     DivByZero BYTE "Error: Division by zero!", 0
     InvalidOperation BYTE "Error: Invalid operation!", 0
     InvalidInput BYTE "Error: Invalid input!", 0
     resultStr BYTE "The result is: ", 0
+    exitingmsg BYTE "Thank you for using calculator " , 0
+
     num1 SDWORD ?
     num2 SDWORD ?
     result SDWORD 10000 DUP(?)
@@ -26,12 +30,7 @@ INCLUDE Irvine32.inc
 
 .code
 main PROC
-    ; Read first number
-    mov edx, OFFSET prompt1
-    call WriteString
-    call ReadInt
-    mov num1, eax
-
+    
     ; Display menu options
     mov edx, OFFSET menuPrompt
     call WriteString
@@ -69,6 +68,9 @@ main PROC
     mov edx, OFFSET option11
     call WriteString
     call Crlf
+    mov edx, OFFSET option12
+    call WriteString
+    call Crlf
 
     ; Read operation
     call ReadInt
@@ -97,15 +99,21 @@ main PROC
     je EXPONENTIATION
     cmp op, 11
     je MODULUS
+    cmp op , 12
+    je EXITER
     jmp INVALID_OP
 
+     
+
 ADDITION:
+    call GET_First_Num
     call GET_SECOND_NUMBER
     add eax, num1
     mov result, eax
     jmp DISPLAY_RESULT
 
 SUBTRACTION:
+    call GET_First_Num
     call GET_SECOND_NUMBER
     mov eax, num1
     sub eax, num2
@@ -228,9 +236,15 @@ GET_SECOND_NUMBER PROC
     ret
 GET_SECOND_NUMBER ENDP
 
+GET_First_Num PROC
+    ; Read first number
+    mov edx, OFFSET prompt1
+    call WriteString
+    call ReadInt
+    mov num1, eax
+GET_First_Num ENDP
+
 ComputeFactorial PROC
-
-
     mov ecx, eax
     mov eax, 1
 FactorialLoop:
@@ -266,8 +280,12 @@ SQRTP PROC
     ret
 SQRTP ENDP
 
+EXITER:
 END_PROGRAM:
     call Crlf
+    mov edx , offset exitingmsg
+    call writestring
+    call crlf
     call WaitMsg
     exit
 main ENDP
