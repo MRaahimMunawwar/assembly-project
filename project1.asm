@@ -25,7 +25,7 @@ INCLUDE Irvine32.inc
 
     num1 SDWORD ?
     num2 SDWORD ?
-    result SDWORD 10000 DUP(?)
+    result SDWORD ?
     op DWORD ?
 
 .code
@@ -124,8 +124,8 @@ MULTIPLICATION:
     call GET_SECOND_NUMBER
     mov eax, num1
     imul eax, num2
-    mov result, eax
-    jmp DISPLAY_RESULT
+
+    jmp DISPLAY_RESULT_MULT
 
 DIVISION:
     call GET_First_Num
@@ -244,9 +244,26 @@ DISPLAY_RESULT:
     call crlf
     call waitmsg
     jmp op_nxt
+
+DISPLAY_RESULT_MULT:
+    mov edx, OFFSET resultStr
+    call WriteString
+    mov result , eax
+    jno l1
+    shl eax , 16
+    shrd eax , edx , 16
+    mov result , eax
     
+    l1:
+    mov eax, result
+    call WriteInt
+    invoke sleep , 1000
+    call crlf
+    call waitmsg
+    jmp op_nxt
+
 END_PROGRAM:
-    Invoke sleep , 900
+    Invoke sleep , 300
     call clrscr
     mov edx , offset exitingmsg
     call writestring
