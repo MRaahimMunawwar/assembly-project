@@ -30,7 +30,6 @@ INCLUDE Irvine32.inc
 
 .code
 main PROC
-    
     op_nxt:
     call clrscr
     ; Display menu options
@@ -104,11 +103,6 @@ main PROC
     cmp op , 12
     je END_PROGRAM
     jmp INVALID_OP
-
-    
-
-
-     
 
 ADDITION:
     call GET_First_Num
@@ -223,18 +217,21 @@ MODULUS:
 INVALID_OP:
     mov edx, OFFSET InvalidOperation
     call WriteString
+    Invoke sleep , 850
     jmp op_nxt
    
 
 DIV_BY_ZERO:
     mov edx, OFFSET DivByZero
     call WriteString
+    Invoke sleep , 850
     jmp op_nxt
     
 
 INVALID_INPUT:
     mov edx, OFFSET InvalidInput
     call WriteString
+    Invoke sleep , 850
     jmp op_nxt
     
 
@@ -243,12 +240,14 @@ DISPLAY_RESULT:
     call WriteString
     mov eax, result
     call WriteInt
-    invoke sleep , 800
+    invoke sleep , 1100
     call crlf
     call waitmsg
     jmp op_nxt
     
 END_PROGRAM:
+    Invoke sleep , 900
+    call clrscr
     mov edx , offset exitingmsg
     call writestring
     call crlf
