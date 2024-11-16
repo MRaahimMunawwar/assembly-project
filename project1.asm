@@ -229,6 +229,8 @@ GET_SECOND_NUMBER PROC
 GET_SECOND_NUMBER ENDP
 
 ComputeFactorial PROC
+
+
     mov ecx, eax
     mov eax, 1
 FactorialLoop:
