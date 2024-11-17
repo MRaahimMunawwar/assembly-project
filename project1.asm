@@ -277,9 +277,15 @@ DISPLAY_RESULT_MULT:
 END_PROGRAM:
     Invoke sleep , 300
     call clrscr
+    mov dh , 04h
+    mov dl , 04h
+    call gotoxy
     mov edx , offset exitingmsg
     call writestring
     call crlf
+    mov dh , 05h
+    mov dl , 05h
+    call gotoxy
     call WaitMsg
 
     exit
