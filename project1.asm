@@ -36,6 +36,8 @@ main PROC
     op_nxt:
     call clrscr
     ; Display menu options
+    mov eax, 03h
+    call setTextcolor
     mov edx, OFFSET menuPrompt
     call WriteString
     call Crlf
@@ -242,6 +244,8 @@ INVALID_INPUT:
     
 
 DISPLAY_RESULT:
+    mov eax, 04h
+    call setTextColor
     mov edx, OFFSET resultStr
     call WriteString
     mov eax, result
@@ -252,6 +256,8 @@ DISPLAY_RESULT:
     jmp op_nxt
 
 DISPLAY_RESULT_MULT:
+    mov eax, 40h
+    call setTextColor
     mov edx, OFFSET resultStr
     call WriteString
     mov result , eax
@@ -316,6 +322,8 @@ PowerDone:
 Power ENDP
 
 GET_First_Num_Div PROC
+    mov eax, 02h
+    call settextcolor
     mov edx, OFFSET prompt1
     call WriteString
     call ReadInt
@@ -324,6 +332,8 @@ GET_First_Num_Div PROC
 GET_First_Num_Div ENDP
 
 GET_Second_Num_Div PROC
+    mov eax, 02h
+    call settextcolor
     mov edx, OFFSET prompt1
     call WriteString
     call ReadInt
@@ -332,6 +342,8 @@ GET_Second_Num_Div PROC
 GET_Second_Num_Div ENDP
 
 GET_First_Num PROC
+    mov eax, 02h
+    call settextcolor
     mov edx, OFFSET prompt1
     call WriteString
     call ReadInt
@@ -340,6 +352,8 @@ GET_First_Num PROC
 GET_First_Num ENDP
 
 GET_SECOND_NUMBER PROC
+    mov eax, 02h
+    call settextcolor
     mov edx, OFFSET prompt2
     call WriteString
     call ReadInt
@@ -348,6 +362,8 @@ GET_SECOND_NUMBER PROC
 GET_SECOND_NUMBER ENDP
 
 GET_First_Num_Fact PROC
+    mov eax, 02h
+    call settextcolor
     nxt_pt:
     mov edx, OFFSET prompt3
     call WriteString
