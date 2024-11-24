@@ -1,3 +1,4 @@
+
 INCLUDE Irvine32.inc
 
 .data
@@ -17,7 +18,10 @@ INCLUDE Irvine32.inc
     option10 BYTE "10: Exponentiation", 0
     option11 BYTE "11: Modulus", 0
     option12 BYTE "12: Exit ", 0
+    option13 BYTE "13: Save last answer", 0
 
+    useLastAns BYTE 0
+    lastResult SDWORD ? 
     DivByZero BYTE "Error: Division by zero!", 0
     InvalidOperation BYTE "Error: Invalid operation!", 0
     InvalidInput BYTE "Error: Invalid input!", 0
@@ -77,6 +81,9 @@ main PROC
     mov edx, OFFSET option12
     call WriteString
     call Crlf
+    mov edx, OFFSET option13
+    call WriteString
+    call Crlf
 
     ; Read operation
     call ReadInt
@@ -106,18 +113,48 @@ main PROC
     cmp op, 11
     je MODULUS
     cmp op , 12
-    je END_PROGRAM
+    je END_PROGRAM 
+    cmp op , 13
+    je SAVE_RESULT
     jmp INVALID_OP
 
+
+
 ADDITION:
-    call GET_First_Num
+    ; Check if we should use the saved result
+    cmp useLastAns, 0
+    je normal_addition
+    
+    ; Use saved result as first number
+    mov eax, lastResult  ; Load saved result
+    mov num1, eax        ; Store it in num1
+    mov useLastAns, 0    ; Reset the flag
+    jmp get_second_only
+
+normal_addition:
+    call GET_First_Num   ; Get both numbers normally
+    
+get_second_only:
     call GET_SECOND_NUMBER
-    add eax, num1
+    mov eax, num1
+    add eax, num2
     mov result, eax
     jmp DISPLAY_RESULT
 
+
 SUBTRACTION:
+    cmp useLastAns, 0
+    je normal_subtraction
+    
+    mov eax, lastResult
+    mov num1, eax
+    mov useLastAns, 0
+    jmp get_second_sub
+
+normal_subtraction:
     call GET_First_Num
+
+get_second_sub:
     call GET_SECOND_NUMBER
     mov eax, num1
     sub eax, num2
@@ -125,41 +162,95 @@ SUBTRACTION:
     jmp DISPLAY_RESULT
 
 MULTIPLICATION:
+    cmp useLastAns, 0
+    je normal_multiplication
+    
+    mov eax, lastResult
+    mov num1, eax
+    mov useLastAns, 0
+    jmp get_second_mult
+
+normal_multiplication:
     call GET_First_Num
+
+get_second_mult:
     call GET_SECOND_NUMBER
     mov eax, num1
     imul eax, num2
-
     jmp DISPLAY_RESULT_MULT
 
 DIVISION:
+    cmp useLastAns, 0
+    je normal_division
+    
+    mov eax, lastResult
+    mov num3, ax  ; Note: Converting SDWORD to SWORD for division
+    mov useLastAns, 0
+    jmp get_second_div
+
+normal_division:
     call GET_First_Num_Div
+
+get_second_div:
     call GET_Second_Num_Div
     cmp num4, 0
     je DIV_BY_ZERO
-    mov eax , 0
-    mov ax,  num3
+    mov eax, 0
+    mov ax, num3
     xor edx, edx
     cwd
     idiv num4
-    movsx eax , ax
-    mov result , eax
+    movsx eax, ax
+    mov result, eax
     jmp DISPLAY_RESULT
 
 SQUARE:
+    cmp useLastAns, 0
+    je normal_square
+    
+    mov eax, lastResult
+    mov num1, eax
+    mov useLastAns, 0
+    jmp do_square
+
+normal_square:
     call GET_First_Num
+
+do_square:
     mov eax, num1
     imul eax, num1
     mov result, eax
     jmp DISPLAY_RESULT
 
 SQRT:
+    cmp useLastAns, 0
+    je normal_sqrt
+    
+    mov eax, lastResult
+    mov num1, eax
+    mov useLastAns, 0
+    jmp do_sqrt
+
+normal_sqrt:
     call GET_First_Num
+
+do_sqrt:
     call SQRTP
     jmp DISPLAY_RESULT
 
 PERMUTATION:
+    cmp useLastAns, 0
+    je normal_perm
+    
+    mov eax, lastResult
+    mov num1, eax
+    mov useLastAns, 0
+    jmp get_second_perm
+
+normal_perm:
     call GET_First_Num
+
+get_second_perm:
     call GET_SECOND_NUMBER
     mov eax, num1
     call ComputeFactorial
@@ -170,13 +261,24 @@ PERMUTATION:
     call ComputeFactorial
     mov ebx, eax
     mov eax, result
-    xor edx, edx      ; Zero out edx to prevent overflow
+    xor edx, edx
     idiv ebx
     mov result, eax
     jmp DISPLAY_RESULT
 
 COMBINATION:
+    cmp useLastAns, 0
+    je normal_comb
+    
+    mov eax, lastResult
+    mov num1, eax
+    mov useLastAns, 0
+    jmp get_second_comb
+
+normal_comb:
     call GET_First_Num
+
+get_second_comb:
     call GET_SECOND_NUMBER
     mov eax, num1
     call ComputeFactorial
@@ -191,20 +293,44 @@ COMBINATION:
     mul ebx
     mov ebx, eax
     mov eax, result
-    xor edx, edx      ; Zero out edx to prevent overflow
+    xor edx, edx
     idiv ebx
     mov result, eax
     jmp DISPLAY_RESULT
 
 FACTORIAL:
+    cmp useLastAns, 0
+    je normal_fact
+    
+    mov eax, lastResult
+    cmp eax, 0    ; Check if saved result is non-negative
+    jl INVALID_INPUT
+    mov num1, eax
+    mov useLastAns, 0
+    jmp do_factorial
+
+normal_fact:
     call GET_First_Num_Fact
-    mov num1 , eax
+
+do_factorial:
+    mov eax, num1
     call ComputeFactorial
     mov result, eax
     jmp DISPLAY_RESULT
 
 EXPONENTIATION:
+    cmp useLastAns, 0
+    je normal_exp
+    
+    mov eax, lastResult
+    mov num1, eax
+    mov useLastAns, 0
+    jmp get_second_exp
+
+normal_exp:
     call GET_First_Num
+
+get_second_exp:
     call GET_SECOND_NUMBER
     mov eax, num1
     mov ecx, num2
@@ -213,7 +339,18 @@ EXPONENTIATION:
     jmp DISPLAY_RESULT
 
 MODULUS:
+    cmp useLastAns, 0
+    je normal_mod
+    
+    mov eax, lastResult
+    mov num1, eax
+    mov useLastAns, 0
+    jmp get_second_mod
+
+normal_mod:
     call GET_First_Num
+
+get_second_mod:
     call GET_SECOND_NUMBER
     mov eax, num1
     mov ebx, num2
@@ -277,10 +414,22 @@ DISPLAY_RESULT_MULT:
 END_PROGRAM:
     Invoke sleep , 300
     call clrscr
+    mov dh , 04h
+    mov dl , 04h
+    call gotoxy
     mov edx , offset exitingmsg
     call writestring
     call crlf
+    mov dh , 05h
+    mov dl , 05h
+    call gotoxy
     call WaitMsg
+
+SAVE_RESULT:
+    mov eax, result
+    mov lastResult, eax  
+    mov useLastAns, 1    
+    jmp op_nxt
 
     exit
 main ENDP
