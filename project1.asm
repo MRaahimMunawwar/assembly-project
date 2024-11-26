@@ -1,5 +1,4 @@
 INCLUDE Irvine32.inc
-
 .data
     prompt1 BYTE "Enter first number : ", 0
     prompt2 BYTE "Enter second number : ", 0
@@ -30,6 +29,8 @@ INCLUDE Irvine32.inc
     num4 SWORD ?
     result SDWORD ?
     op DWORD ?
+
+    lastResult dword 0h
 
 .code
 main PROC
@@ -79,6 +80,10 @@ main PROC
     call Crlf
 
     ; Read operation
+    call readchar
+  
+    cmp al, 27d         
+    je RECALL_RESULT
     call ReadInt
     mov op, eax
 
@@ -240,6 +245,12 @@ INVALID_INPUT:
     mov edx, OFFSET InvalidInput
     call WriteString
     Invoke sleep , 850
+    jmp op_nxt
+
+RECALL_RESULT:
+    mov eax, lastResult 
+    mov result , eax
+    call DISPLAY_RESULT
     jmp op_nxt
     
 
