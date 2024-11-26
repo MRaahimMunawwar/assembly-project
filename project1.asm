@@ -34,8 +34,6 @@ INCLUDE Irvine32.inc
     result SDWORD ?
     op DWORD ?
 
-    lastResult dword 0h
-
 .code
 main PROC
     op_nxt:
@@ -435,12 +433,15 @@ END_PROGRAM:
     mov dl , 05h
     call gotoxy
     call WaitMsg
+    jmp nothing
 
 SAVE_RESULT:
     mov eax, result
     mov lastResult, eax  
     mov useLastAns, 1    
     jmp op_nxt
+
+nothing:
 
     exit
 main ENDP
