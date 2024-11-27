@@ -265,17 +265,19 @@ get_second_perm:
     mov eax , num2
     cmp eax, num1
     jg INVALID_INPUT  ; Jumping if num2 > num1
+
     mov eax, num1
-    call ComputeFactorial
+    call ComputeFactorialComb
+
     mov result, eax
     mov eax, num1
     mov ebx, num2
     sub eax, ebx
-    call ComputeFactorial
+    call ComputeFactorialComb
     mov ebx, eax
     mov eax, result
     xor edx, edx
-    idiv ebx
+    div bx
     mov result, eax
     jmp DISPLAY_RESULT
 
@@ -298,15 +300,15 @@ get_second_comb:
     cmp eax, num1
     jg INVALID_INPUT  ; Jumping if num2 > num1
     mov eax, num1
-    call ComputeFactorial
+    call ComputeFactorialComb
     mov result, eax
     mov eax, num1
     mov ebx, num2
     sub eax, ebx
-    call ComputeFactorial
+    call ComputeFactorialComb
     mov ebx, eax
     mov eax, num2
-    call ComputeFactorial
+    call ComputeFactorialComb
     mul ebx
     mov ebx, eax
     mov eax, result
@@ -490,6 +492,21 @@ ComputeFactorial PROC
     FactorialDone:
         ret
 ComputeFactorial ENDP
+
+ComputeFactorialComb PROC
+    mov ecx, eax
+    cmp ecx, 0
+    jle FactorialDone
+    mov eax, 1
+    FactorialLoop:
+        cmp ecx, 1
+        jle FactorialDone
+        imul eax, ecx
+        dec ecx
+        jmp FactorialLoop
+    FactorialDone:
+        ret
+ComputeFactorialComb ENDP
 
 Power PROC
     push ebx
