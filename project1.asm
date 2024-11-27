@@ -1,4 +1,3 @@
-
 INCLUDE Irvine32.inc
 .data
     prompt1 BYTE "Enter first number : ", 0
@@ -179,9 +178,17 @@ normal_multiplication:
 get_second_mult:
     call GET_SECOND_NUMBER
     mov eax, num1
-    imul eax, num2
-    jmp DISPLAY_RESULT_MULT
+    imul  num2
+    jo OVERFLOW_HANDLER  
+    mov result, eax
+    jmp DISPLAY_RESULt_mult
 
+OVERFLOW_HANDLER:
+    ; Handle overflow condition
+    mov edx, OFFSET InvalidInput  
+    call WriteString
+    invoke sleep, 850
+    jmp op_nxt
 DIVISION:
     cmp useLastAns, 0
     je normal_division
@@ -255,6 +262,9 @@ normal_perm:
 
 get_second_perm:
     call GET_SECOND_NUMBER
+    mov eax , num2
+    cmp eax, num1
+    jg INVALID_INPUT  ; Jumping if num2 > num1
     mov eax, num1
     call ComputeFactorial
     mov result, eax
@@ -280,9 +290,13 @@ COMBINATION:
 
 normal_comb:
     call GET_First_Num
+    
 
 get_second_comb:
     call GET_SECOND_NUMBER
+    mov eax , num2
+    cmp eax, num1
+    jg INVALID_INPUT  ; Jumping if num2 > num1
     mov eax, num1
     call ComputeFactorial
     mov result, eax
@@ -400,25 +414,35 @@ DISPLAY_RESULT:
     call crlf
     call waitmsg
     jmp op_nxt
-
 DISPLAY_RESULT_MULT:
     mov eax, 40h
     call setTextColor
     mov edx, OFFSET resultStr
     call WriteString
-    mov result , eax
-    jno l1
-    shl eax , 16
-    shrd eax , edx , 16
-    mov result , eax
     
-    l1:
-    mov eax, result
-    call WriteInt
-    invoke sleep , 1000
-    call crlf
-    call waitmsg
-    jmp op_nxt
+    mov eax, result  ; Load the result into eax
+    
+    ; Check for overflow condition
+    jno l1          
+    
+    shl eax, 16     
+    mov edx, 0       
+    shrd eax, edx, 16 
+    
+    mov result, eax  ; Storing the modified number after shifting operation
+    
+l1:
+    mov eax, result  
+    call WriteInt    
+    
+    invoke Sleep, 1200   ; Wait for 1 second
+    call Crlf            
+    call WaitMsg   
+
+    mov eax, 07h
+    call setTextColor
+    
+    jmp op_nxt           ; Jump to next operation
 
 END_PROGRAM:
     Invoke sleep , 300
