@@ -268,16 +268,17 @@ get_second_perm:
 
     mov eax, num1
     call ComputeFactorialComb
-
+    ; eax = n!
     mov result, eax
     mov eax, num1
     mov ebx, num2
-    sub eax, ebx
+    sub eax, ebx ; eax = eax - ebx -> (n -r)
     call ComputeFactorialComb
+    ;eax = (n-r)!
     mov ebx, eax
     mov eax, result
     xor edx, edx
-    div bx
+    div ebx
     mov result, eax
     jmp DISPLAY_RESULT
 
@@ -299,19 +300,21 @@ get_second_comb:
     mov eax , num2
     cmp eax, num1
     jg INVALID_INPUT  ; Jumping if num2 > num1
+    ; n!
     mov eax, num1
     call ComputeFactorialComb
-    mov result, eax
+    mov result, eax ;n! saved
     mov eax, num1
     mov ebx, num2
-    sub eax, ebx
+    sub eax, ebx ; (n-r)! calculation
     call ComputeFactorialComb
-    mov ebx, eax
-    mov eax, num2
+    mov ebx, eax ;ebx = (n-r)! saved
+    mov eax, num2 ; eax = r
     call ComputeFactorialComb
-    mul ebx
-    mov ebx, eax
-    mov eax, result
+    ; eax = r!
+    mul bx ; eax = (n-r)! * r!
+    mov ebx, eax ; ebx = (n-r)! * r!
+    mov eax, result ; eax = n!
     xor edx, edx
     idiv ebx
     mov result, eax
