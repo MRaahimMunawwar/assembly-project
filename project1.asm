@@ -27,6 +27,7 @@ INCLUDE Irvine32.inc
     resultStr BYTE "The result is: ", 0
     retainResult BYTE "Previous answer is: ", 0
     exitingmsg BYTE "Thank you for using calculator " , 0
+    emptystackmsg BYTE "There is no previous value " , 0
 
     num1 SDWORD ?
     num2 SDWORD ?
@@ -427,14 +428,21 @@ DISPLAY_RESULT:
 DISPLAY_RESULT_Recall:
     mov eax, 04h
     call setTextColor
-    mov edx, OFFSET retainResult
-    call WriteString
     pop eax
     cmp eax , 0
-    jne nrp
-    push 0
+    je nrp
+    jmp nextp
     nrp:
+    mov edx , offset emptystackmsg
+    call writestring
+    call crlf
+    push 0
+    jmp nextpr
+    nextp:
+    mov edx, OFFSET retainResult
+    call WriteString
     call WriteInt
+    nextpr:
     Invoke sleep , 1100
     call crlf
     call waitmsg
