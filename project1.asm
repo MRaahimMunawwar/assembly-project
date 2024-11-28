@@ -514,6 +514,8 @@ SQRTP ENDP
 ComputeFactorial PROC
     mov ecx, num1
     mov eax, 1
+    cmp ecx , 0
+    jle FactorialDone
     FactorialLoop:
         cmp ecx, 1
         jle FactorialDone
@@ -526,9 +528,9 @@ ComputeFactorial ENDP
 
 ComputeFactorialComb PROC
     mov ecx, eax
+    mov eax, 1
     cmp ecx, 0
     jle FactorialDone
-    mov eax, 1
     FactorialLoop:
         cmp ecx, 1
         jle FactorialDone
