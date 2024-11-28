@@ -3,6 +3,7 @@ INCLUDE Irvine32.inc
     prompt1 BYTE "Enter first number : ", 0
     prompt2 BYTE "Enter second number : ", 0
     prompt3 BYTE "Enter the number : " , 0
+    prompt BYTE "Enter the non negative number: " , 0
     menuPrompt BYTE "Enter operation:", 0
     option1 BYTE "1: Addition", 0
     option2 BYTE "2: Subtraction", 0
@@ -24,6 +25,7 @@ INCLUDE Irvine32.inc
     InvalidOperation BYTE "Error: Invalid operation!", 0
     InvalidInput BYTE "Error: Invalid input!", 0
     resultStr BYTE "The result is: ", 0
+    retainResult BYTE "Previous answer is: ", 0
     exitingmsg BYTE "Thank you for using calculator " , 0
 
     num1 SDWORD ?
@@ -32,9 +34,12 @@ INCLUDE Irvine32.inc
     num4 SWORD ?
     result SDWORD ?
     op DWORD ?
+   
 
 .code
 main PROC
+    ;Pushing Initial Value 0
+    push 0
     op_nxt:
     call clrscr
     ; Display menu options
@@ -242,7 +247,7 @@ SQRT:
     jmp do_sqrt
 
 normal_sqrt:
-    call GET_First_Num
+    call GET_First_Num_Floatsqr
 
 do_sqrt:
     call SQRTP
@@ -379,6 +384,7 @@ get_second_mod:
     xor edx, edx
     idiv ebx
     mov result, edx
+    push edx
     jmp DISPLAY_RESULT
 
 INVALID_OP:
@@ -402,23 +408,34 @@ INVALID_INPUT:
     jmp op_nxt
 
 RECALL_RESULT:
-    mov eax, lastResult 
-    mov result , eax
-    call DISPLAY_RESULT
+    jmp DISPLAY_RESULT_Recall
     jmp op_nxt
     
-
 DISPLAY_RESULT:
     mov eax, 04h
     call setTextColor
     mov edx, OFFSET resultStr
     call WriteString
     mov eax, result
+    push eax
     call WriteInt
     Invoke sleep , 1100
     call crlf
     call waitmsg
     jmp op_nxt
+
+DISPLAY_RESULT_Recall:
+    mov eax, 04h
+    call setTextColor
+    mov edx, OFFSET retainResult
+    call WriteString
+    pop eax
+    call WriteInt
+    Invoke sleep , 1100
+    call crlf
+    call waitmsg
+    jmp op_nxt
+
 DISPLAY_RESULT_MULT:
     mov eax, 40h
     call setTextColor
@@ -437,16 +454,15 @@ DISPLAY_RESULT_MULT:
     mov result, eax  ; Storing the modified number after shifting operation
     
 l1:
-    mov eax, result  
+    mov eax, result 
+    push eax
     call WriteInt    
-    
     invoke Sleep, 1200   ; Wait for 1 second
     call Crlf            
     call WaitMsg   
 
     mov eax, 07h
     call setTextColor
-    
     jmp op_nxt           ; Jump to next operation
 
 END_PROGRAM:
@@ -555,6 +571,19 @@ GET_First_Num PROC
     mov num1, eax
     ret
 GET_First_Num ENDP
+
+GET_First_Num_Floatsqr PROC
+    again:
+    mov eax, 02h
+    call settextcolor
+    mov edx, OFFSET prompt1
+    call WriteString
+    call ReadInt
+    cmp eax , 0
+    jle again
+    mov num1, eax
+    ret
+GET_First_Num_Floatsqr ENDP
 
 GET_SECOND_NUMBER PROC
     mov eax, 02h
