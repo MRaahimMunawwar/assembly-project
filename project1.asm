@@ -430,6 +430,10 @@ DISPLAY_RESULT_Recall:
     mov edx, OFFSET retainResult
     call WriteString
     pop eax
+    cmp eax , 0
+    jne nrp
+    push 0
+    nrp:
     call WriteInt
     Invoke sleep , 1100
     call crlf
